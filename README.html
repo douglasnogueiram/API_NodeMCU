@@ -1,0 +1,76 @@
+<!DOCTYPE html><html><head><base href=\"https://html-online.com/editor/\"><link type=\"text/css\" rel=\"stylesheet\" href=\"https://html-online.com/editor/tinymce4_6_5/skins/lightgray/content.min.css\"></head><body id=\"tinymce\" class=\"mce-content-body \"><h1 style=\"color: #5e9ca0;\">Bem-vindo a API de utiliza&ccedil;&atilde;o do ESP8233 (NodeMCU)!</h1>
+<h2 style=\"color: #2e6c80;\">O que esta API faz?</h2>
+<p>Atrav&eacute;s dela, voc&ecirc; pode acionar as GPIOs do ESP8233 (NodeMCU), alterando os status para ligado ou desligado.</p>
+<p><img style=\"display: block; margin-left: auto; margin-right: auto;\" src=\"http://www.electronicwings.com/public/images/user_images/images/NodeMCU/NodeMCU%20Basics%20using%20ESPlorer%20IDE/NodeMCU%20GPIO/NodeMCU%20GPIOs.png\" alt=\"GPIOs\" width=\"321\" height=\"363\" /></p>
+<p>GPIOs em azul n&atilde;o podem ser utiizadas ou n&atilde;o s&atilde;o recomendadas para utiliza&ccedil;&atilde;o direta.</p>
+<h2 style=\"color: #2e6c80;\">Opera&ccedil;&otilde;es:</h2>
+<table class=\"editorDemoTable\" style=\"width: 812px;\">
+<thead>
+<tr>
+<td style=\"width: 69px;\">Verbo HTTP</td>
+<td style=\"width: 727px;\">Detalhamento</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style=\"width: 69px;\">POST</td>
+<td style=\"width: 727px;\">
+<p>Para inicializar a GPIO, os seguintes par&acirc;metros dever&atilde;o ser informados:</p>
+<p>GPIO: (preencher como \"gpio\"): indicar qual GPIO voc&ecirc; deseja utilizar entre as dispon&iacute;veis (2,4,5,12,13,14,15,16). Outros valores n&atilde;o s&atilde;o aceitos!</p>
+<p>Modo de entrada (n&atilde;o &eacute; obrigat&oacute;rio neste momento - preencher como \"pinMod\"): indicar ser&aacute; do tipo anal&oacute;gica ou digital, sendo que o default &eacute; DIGITAL. Caso queira mudar para anal&oacute;gico, obrigatoriamente voc&ecirc; dever&aacute; escrever ANALOG e qualquer outro valor &eacute; considerado DIGITAL.</p>
+<p>No caso de uma sa&iacute;da anal&oacute;gica, o par&acirc;metro \"potencia\" deve ser um valor entre 0 a 1023. Valores acima de 1023 s&atilde;o assumidos automaticamente como 1023. Quando o status estiver marcado como 0, automaticamente a API converte a pot&ecirc;ncia para 0.</p>
+<p>O Id &eacute; gerado automaticamente.</p>
+<p>JSON de request:</p>
+<p>{<br /> \"gpio\":12<br /> }</p>
+<p>JSON de response:</p>
+<p>{<br />\"id\": 1,<br />\"gpio\": 12,<br />\"pinMod\": \"\",<br />\"potencia\": 0,<br />\"status\": 0<br />}</p>
+<p>C&oacute;digos de resposta:</p>
+<p>201 (Created) - Request respondido com sucesso.</p>
+<p>400 (Bad request) - Erro na estrutura do JSON</p>
+<p>404 (Not found) - GPIO informada n&atilde;o est&aacute; na lista de op&ccedil;&otilde;es v&aacute;lidas</p>
+</td>
+</tr>
+<tr>
+<td style=\"width: 69px;\">PUT</td>
+<td style=\"width: 727px;\">
+<p>As GPIOs criadas via POST poder&atilde;o ter seu status (ligada ou desligada) atualizados por este m&eacute;todo. Para isso, o par&acirc;metro \"status\" deve ser respondido com 0 ou 1.</p>
+<p>No PUT &eacute; poss&iacute;vel alterar os par&acirc;metros:</p>
+<ul>
+<li>\"pinMod\": altera&ccedil;&atilde;o entre anal&oacute;gico (\"ANALOG\") e digital (\"DIGITAL\");</li>
+<li>\"potencia\": quando a configura&ccedil;&atilde;o &eacute; anal&oacute;gica, altera o total da tens&atilde;o no pino entre 0 (m&iacute;nimo) a 1023 (m&aacute;ximo)</li>
+<li>\"status\": o valor 0 desliga a GPIO e o valor 1 a liga</li>
+</ul>
+<p>O ID &eacute; obrigat&oacute;rio na opera&ccedil;&atilde;o, e n&atilde;o &eacute; poss&iacute;vel alterar a GPIO deste pino uma vez que ela &eacute; criada (s&oacute; pode haver um ID para cada GPIO dispon&iacute;vel).</p>
+<p>JSON de request:</p>
+<p>{<br />\"id\": 1,<br />\"pinMod\": \"ANALOG\",<br />\"potencia\": 1023,<br />\"status\": 1<br />}</p>
+<p>JSON de response:</p>
+<p>{<br />\"id\": 1,<br />\"gpio\": 12,<br />\"pinMod\": \"ANALOG\",<br />\"potencia\": 1023,<br />\"status\": 1<br />}</p>
+<p>C&oacute;digos de resposta:</p>
+<p>200 (OK) - Atualizado com sucesso</p>
+<p>400 (Bad request) - Erro na estrutura do JSON</p>
+<p>404 (Not found) - ID informado n&atilde;o existe</p>
+</td>
+</tr>
+<tr>
+<td style=\"width: 69px;\">GET</td>
+<td style=\"width: 727px;\">
+<p>Existem duas formas de chamar o m&eacute;todo GET:&nbsp;</p>
+<ul>
+<li>Por lista</li>
+<li>Por query/par&acirc;metros</li>
+</ul>
+<p>Ao informar o endere&ccedil;o local (http://xxx.xxx.xxx.xxx/leds), a API ir&aacute; mostrar a lista de GPIOs criadas com sua parametriza&ccedil;&atilde;o atual:</p>
+<p>JSON de response:</p>
+<p>[<br />{<br />\"id\": 1,<br />\"gpio\": 2,<br /> \"pinMod\": \"OUTPUT\",<br /> \"status\": 1<br /> },<br /> {<br /> \"id\": 2,<br /> \"gpio\": 4,<br /> \"pinMod\": \"OUTPUT\",<br /> \"status\": 1<br /> }<br />]</p>
+<p>&nbsp;</p>
+<p>J&aacute; quando &eacute; passado o par&acirc;metro id&nbsp;&nbsp;(http://xxx.xxx.xxx.xxx/leds?id=1), ele retorna apenas o elemento consultado, caso exista:</p>
+<p>C&oacute;digos de resposta:</p>
+<p>200 (OK) - Lista retornada com sucesso</p>
+<p>204 (No content) - Lista vazia de elementos: n&atilde;o existe nenhuma GPIO criada</p>
+<p>404 (Not found) - ID informado n&atilde;o existe</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p><strong>Douglas Melo - 12/2018</strong></body></html>
